@@ -4,10 +4,14 @@ Script for downloading + cropping video and audio segments from the [VFHQ](https
 
 # Setup
 
-`pip install -r requirements.txt`
-`mkdir meta_info`
-`unzip meta_info.zip -d meta_info/`
+```
+pip install -r requirements.txt
+mkdir meta_info
+unzip meta_info.zip -d meta_info/
+```
 
 # Running
 
-`python download_clips.py`
+```
+python download_clips.py
+```
