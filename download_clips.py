@@ -48,6 +48,11 @@ if __name__ == '__main__':
     for fname in meta_fnames:
         clip_metas.append(parse_clip_meta(fname))
 
+    # calculate median end_t - start_t
+    durations = [meta.end_t - meta.start_t for meta in clip_metas]
+    median_duration = sorted(durations)[len(durations) // 2]
+    print('Median duration: %.2f' % (median_duration))
+
     video_ids = set(meta.video_id for meta in clip_metas)
     print('Found %d unique videos' % (len(video_ids)))
 
