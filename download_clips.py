@@ -8,6 +8,7 @@ import subprocess
 from tqdm import tqdm
 from functools import partial
 from vfhq_dl.parse_meta_info import parse_clip_meta
+from vfhq_dl.util import VIDEO_EXTENSIONS
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_dir', type=str, default='meta_info',
@@ -21,7 +22,8 @@ args = parser.parse_args()
 def download_video(output_dir, video_id):
     r"""Download video."""
     video_path = os.path.join(output_dir, video_id)
-    if not os.path.isfile(video_path):
+    out_paths = [video_path + ext for ext in VIDEO_EXTENSIONS]
+    if not any(os.path.isfile(out_path) for out_path in out_path):
         try:
             # Download the highest quality mp4 stream.
             command = [

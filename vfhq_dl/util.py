@@ -1,0 +1,1 @@
+VIDEO_EXTENSIONS = [".mp4", ".webm", ".mkv"]
