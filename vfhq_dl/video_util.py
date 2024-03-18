@@ -1,6 +1,7 @@
 from decord import VideoReader
 from decord import cpu, gpu
 import numpy as np
+from PIL import Image
 
 ctx = cpu(0)
 
@@ -10,9 +11,9 @@ def sample_frames_from_video(video_path: str):
     out = []
     for i in range(3):
         try:
-            out.append(vr.next().asnumpy())
+            out.append(Image.fromarray(vr.next().asnumpy()))
         except StopIteration:
             break
         vr.skip_frames(20)
 
-    return np.stack(out, axis=0)
+    return out
