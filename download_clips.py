@@ -23,7 +23,7 @@ def download_video(output_dir, video_id):
     r"""Download video."""
     video_path = os.path.join(output_dir, video_id)
     out_paths = [video_path + ext for ext in VIDEO_EXTENSIONS]
-    if not any(os.path.isfile(out_path) for out_path in out_path):
+    if not any(os.path.isfile(out_path) for out_path in out_paths):
         try:
             # Download the highest quality mp4 stream.
             command = [
