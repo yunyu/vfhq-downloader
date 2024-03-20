@@ -40,7 +40,7 @@ async def _infer_from_openai(img_base64_url):
             "content": [
                 {
                     "type": "text",
-                    "text": "Is the lower part of this face occluded by anything, like a hand or microphone? Answer with only `YES` or `NO`.",
+                    "text": "Is the lower part of the face occluded by an object, like a hand or microphone? An object is occluding only if it physically covers the jaw or mouth, not if it merely covers the neck or barely touches those areas. Answer YES or NO wrapped in <answer></answer> tags.",
                 },
                 {
                     "type": "image_url",
@@ -59,12 +59,20 @@ async def _infer_from_openai(img_base64_url):
     response = await client.chat.completions.create(
         model="gpt-4-vision-preview",
         messages=messages,
-        max_tokens=3,
+        max_tokens=32,
         temperature=0,
     )
     choice = response.choices[0].message.content
-    result = "yes" in choice.lower()
-    result_cache[message_hash] = result
+    if "<answer>yes" in choice.lower():
+        result = True
+        result_cache[message_hash] = result
+    elif "<answer>no" in choice.lower():
+        result = False
+        result_cache[message_hash] = result
+    else:
+        print(f"Unexpected response: {choice}")
+        result = False
+
     return result
 
 

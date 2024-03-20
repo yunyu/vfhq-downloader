@@ -26,9 +26,17 @@ async def main():
     #         "Clip+-aQ4eQV8uH0+P0+C2.mp4",
     #         "Clip+_Xf0vkqPWzg+P0+C0.mp4",
     #         "Clip+jwuL71fWom0+P0+C0.mp4",
+    #         "Clip+an23gYUOdSY+P0+C0.mp4",
     #         "Clip+Z2_OJWthxbA+P0+C0.mp4",
+    #         "Clip+TMgDFDn_vDg+P0+C0.mp4",
+    #         "Clip+7p-3VN1_bpw+P0+C2.mp4"
     #     ]
     # ]
+
+    # delete output file if it exists
+    if os.path.exists(args.output_file):
+        os.remove(args.output_file)
+
     for fname in fnames:
         o = sample_frames_from_video(fname)
         # classify second extracted frame
