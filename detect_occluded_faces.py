@@ -38,7 +38,11 @@ async def main():
         os.remove(args.output_file)
 
     for fname in fnames:
-        o = sample_frames_from_video(fname)
+        try:
+            o = sample_frames_from_video(fname)
+        except Exception as e:
+            print(f"Error reading video: {e}")
+            continue
         # classify second extracted frame
         occluded = await classify_face_occluded(o[1])
         if occluded:
