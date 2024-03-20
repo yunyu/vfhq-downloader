@@ -6,7 +6,7 @@ from PIL import Image
 ctx = cpu(0)
 
 def sample_frames_from_video(video_path: str):
-    vr = VideoReader(video_path, ctx=ctx, width=256, height=256)
+    vr = VideoReader(video_path, ctx=ctx, width=512, height=512)
 
     out = []
     for i in range(3):

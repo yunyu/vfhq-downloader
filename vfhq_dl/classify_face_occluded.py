@@ -40,7 +40,7 @@ def _infer_from_openai(img_base64_url):
             "content": [
                 {
                     "type": "text",
-                    "text": "Is the lower part of the face occluded by an object, like a hand or microphone? An object is occluding only if it physically covers the jaw or mouth, not if it merely covers the neck or barely touches those areas. Answer YES or NO wrapped in <answer></answer> tags.",
+                    "text": "Does an object directly physically overlap the mouth region? Ignore objects that are merely positioned closely/only cover the jaw or neck. Answer YES or NO wrapped in <answer></answer> tags, explaining your reasoning.",
                 },
                 {
                     "type": "image_url",
@@ -77,8 +77,6 @@ def _infer_from_openai(img_base64_url):
 
 
 def classify_face_occluded(image: Image.Image):
-    image.thumbnail((256, 256))
-
     # Save the image to a BytesIO object as JPEG
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
