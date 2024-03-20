@@ -21,7 +21,7 @@ parser.add_argument(
 )
 parser.add_argument("--output_file", type=str, default="data/occluded_videos.txt")
 parser.add_argument(
-    "--num_workers", type=int, default=4, help="How many multiprocessing workers?"
+    "--num_workers", type=int, default=6, help="How many multiprocessing workers?"
 )
 args = parser.parse_args()
 

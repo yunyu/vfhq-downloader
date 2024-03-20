@@ -40,7 +40,7 @@ def _infer_from_openai(img_base64_url):
             "content": [
                 {
                     "type": "text",
-                    "text": "Does an object directly physically overlap the mouth region? Ignore objects that are merely positioned closely/only cover the jaw or neck. Answer YES or NO wrapped in <answer></answer> tags, explaining your reasoning.",
+                    "text": "Is there an object directly covering the mouth or jawline? Ignore objects that are merely positioned closely/only cover the jaw or neck - they must actually overlap. Answer YES or NO wrapped in <answer></answer> tags, explaining your reasoning.",
                 },
                 {
                     "type": "image_url",
