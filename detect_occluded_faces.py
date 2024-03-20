@@ -25,6 +25,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+l = mp.Lock()
 
 def detect_occlusion_for_file(output_file: str, fname: str):
     try:
@@ -35,9 +36,10 @@ def detect_occlusion_for_file(output_file: str, fname: str):
     occluded = classify_face_occluded(o[1])
     if occluded:
         print(f"Occluded: {fname}")
+        l.acquire()
         with open(args.output_file, "a") as f:
             f.write(fname + "\n")
-
+        l.release()
 
 if __name__ == "__main__":
     fnames = glob.glob(os.path.join(args.cropped_video_dir, "*.mp4"))
