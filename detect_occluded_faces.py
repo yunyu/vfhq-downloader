@@ -1,13 +1,42 @@
-from face_occlusion.model import Model as OcclusionModel, load_weight
 from vfhq_dl.video_util import sample_frames_from_video
-from face_occlusion.classify_image import classify_image
+from vfhq_dl.classify_face_occluded import classify_face_occluded
 import torch
+import glob
+import os
+import argparse
+import tqdm
+import asyncio
 
-model = OcclusionModel("vgg16", 2, False).to("cuda")
-model = load_weight(model, "pretrained_models/vgg16_occlusion/best_vgg16.pth")
-model.eval()
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--cropped_video_dir",
+    type=str,
+    default="data/cropped_videos",
+    help="Location of cropped videos",
+)
+parser.add_argument("--output_file", type=str, default="data/occluded_videos.txt")
+args = parser.parse_args()
 
-o = sample_frames_from_video("data/cropped_videos/Clip+-aQ4eQV8uH0+P0+C2.mp4")
+async def main():
+    fnames = tqdm.tqdm(glob.glob(os.path.join(args.cropped_video_dir, "*.mp4")))
+    fnames = [
+        os.path.join(args.cropped_video_dir, fname)
+        for fname in [
+            "Clip+79vu9mgSorY+P0+C0.mp4",
+            "Clip+-aQ4eQV8uH0+P0+C2.mp4",
+            "Clip+_Xf0vkqPWzg+P0+C0.mp4",
+            "Clip+jwuL71fWom0+P0+C0.mp4",
+            "Clip+Z2_OJWthxbA+P0+C0.mp4",
+        ]
+    ]
+    for fname in fnames:
+        o = sample_frames_from_video(fname)
+        # classify second extracted frame
+        occluded = await classify_face_occluded(o[1])
+        if occluded:
+            print(f"Occluded: {fname}")
+            with open(args.output_file, "a") as f:
+                f.write(fname + "\n")
 
-for img in o:
-    print(classify_image(img, model, device="cuda"))
+if __name__ == "__main__":
+    asyncio.run(main())

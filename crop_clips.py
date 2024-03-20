@@ -19,7 +19,7 @@ parser.add_argument('--input_dir', type=str, default='meta_info',
 parser.add_argument('--download_dir', type=str, default='data/youtube_videos',
                     help='Location of downloaded videos')
 parser.add_argument('--output_dir', type=str, default='data/cropped_videos',
-                    help='Location of downloaded videos')
+                    help='Location of cropped videos')
 parser.add_argument('--num_workers', type=int, default=8,
                     help='How many multiprocessing workers?')
 args = parser.parse_args()

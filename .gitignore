@@ -3,3 +3,5 @@
 __pycache__
 meta_info/*.txt
 data/
+.env
+.face_occluded_cache/
