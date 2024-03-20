@@ -19,7 +19,7 @@ parser.add_argument(
     default="data/cropped_videos",
     help="Location of cropped videos",
 )
-parser.add_argument("--output_file", type=str, default="data/occluded_videos.txt")
+parser.add_argument("--output_file", type=str, default="data/occluded_video_paths.txt")
 parser.add_argument(
     "--num_workers", type=int, default=6, help="How many multiprocessing workers?"
 )
