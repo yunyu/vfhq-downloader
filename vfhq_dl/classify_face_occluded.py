@@ -1,4 +1,4 @@
-from openai import AsyncOpenAI, OpenAIError
+from openai import OpenAI, OpenAIError
 from dotenv import load_dotenv
 from PIL import Image
 import os
@@ -11,7 +11,7 @@ import backoff
 
 load_dotenv()
 
-client = AsyncOpenAI(
+client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
 )
 result_cache = diskcache.Cache(".face_occluded_cache")
@@ -33,7 +33,7 @@ def string_to_sha256(input_string):
     return hex_digest
 
 @backoff.on_exception(backoff.expo, OpenAIError, max_time=30)
-async def _infer_from_openai(img_base64_url):
+def _infer_from_openai(img_base64_url):
     messages = [
         {
             "role": "user",
@@ -56,7 +56,7 @@ async def _infer_from_openai(img_base64_url):
     if message_hash in result_cache:
         return result_cache[message_hash]
 
-    response = await client.chat.completions.create(
+    response = client.chat.completions.create(
         model="gpt-4-vision-preview",
         messages=messages,
         max_tokens=32,
@@ -76,7 +76,7 @@ async def _infer_from_openai(img_base64_url):
     return result
 
 
-async def classify_face_occluded(image: Image.Image):
+def classify_face_occluded(image: Image.Image):
     image.thumbnail((256, 256))
 
     # Save the image to a BytesIO object as JPEG
@@ -92,7 +92,7 @@ async def classify_face_occluded(image: Image.Image):
 
     # pass into openai
     try:
-        result = await _infer_from_openai(img_base64_url)
+        result = _infer_from_openai(img_base64_url)
         return result
     except OpenAIError as e:
         print(f"Error: {e}")

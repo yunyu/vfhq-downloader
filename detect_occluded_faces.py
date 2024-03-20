@@ -1,11 +1,16 @@
-from vfhq_dl.video_util import sample_frames_from_video
-from vfhq_dl.classify_face_occluded import classify_face_occluded
-import torch
-import glob
-import os
 import argparse
-import tqdm
 import asyncio
+import glob
+import multiprocessing as mp
+import os
+from functools import partial
+from time import time as timer
+
+import torch
+from tqdm import tqdm
+
+from vfhq_dl.classify_face_occluded import classify_face_occluded
+from vfhq_dl.video_util import sample_frames_from_video
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -15,10 +20,27 @@ parser.add_argument(
     help="Location of cropped videos",
 )
 parser.add_argument("--output_file", type=str, default="data/occluded_videos.txt")
+parser.add_argument(
+    "--num_workers", type=int, default=4, help="How many multiprocessing workers?"
+)
 args = parser.parse_args()
 
-async def main():
-    fnames = tqdm.tqdm(glob.glob(os.path.join(args.cropped_video_dir, "*.mp4")))
+
+def detect_occlusion_for_file(output_file: str, fname: str):
+    try:
+        o = sample_frames_from_video(fname)
+    except Exception as e:
+        print(f"Error reading video: {e}")
+        return
+    occluded = classify_face_occluded(o[1])
+    if occluded:
+        print(f"Occluded: {fname}")
+        with open(args.output_file, "a") as f:
+            f.write(fname + "\n")
+
+
+if __name__ == "__main__":
+    fnames = glob.glob(os.path.join(args.cropped_video_dir, "*.mp4"))
     # fnames = [
     #     os.path.join(args.cropped_video_dir, fname)
     #     for fname in [
@@ -33,22 +55,16 @@ async def main():
     #     ]
     # ]
 
+    print("Found %d unique clips" % (len(fnames)))
+
     # delete output file if it exists
     if os.path.exists(args.output_file):
         os.remove(args.output_file)
 
-    for fname in fnames:
-        try:
-            o = sample_frames_from_video(fname)
-        except Exception as e:
-            print(f"Error reading video: {e}")
-            continue
-        # classify second extracted frame
-        occluded = await classify_face_occluded(o[1])
-        if occluded:
-            print(f"Occluded: {fname}")
-            with open(args.output_file, "a") as f:
-                f.write(fname + "\n")
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    detector = partial(detect_occlusion_for_file, args.output_file)
+    start = timer()
+    pool_size = args.num_workers
+    print("Using pool size of %d" % (pool_size))
+    with mp.Pool(processes=pool_size) as p:
+        _ = list(tqdm(p.imap_unordered(detector, fnames), total=len(fnames)))
+    print("Elapsed time: %.2f" % (timer() - start))
