@@ -83,5 +83,9 @@ async def classify_face_occluded(image: Image.Image):
     # print(len(img_base64_url))
 
     # pass into openai
-    result = await _infer_from_openai(img_base64_url)
-    return result
+    try:
+        result = await _infer_from_openai(img_base64_url)
+        return result
+    except OpenAIError as e:
+        print(f"Error: {e}")
+        return False # leave video in if error

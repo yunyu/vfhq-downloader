@@ -19,16 +19,16 @@ args = parser.parse_args()
 
 async def main():
     fnames = tqdm.tqdm(glob.glob(os.path.join(args.cropped_video_dir, "*.mp4")))
-    fnames = [
-        os.path.join(args.cropped_video_dir, fname)
-        for fname in [
-            "Clip+79vu9mgSorY+P0+C0.mp4",
-            "Clip+-aQ4eQV8uH0+P0+C2.mp4",
-            "Clip+_Xf0vkqPWzg+P0+C0.mp4",
-            "Clip+jwuL71fWom0+P0+C0.mp4",
-            "Clip+Z2_OJWthxbA+P0+C0.mp4",
-        ]
-    ]
+    # fnames = [
+    #     os.path.join(args.cropped_video_dir, fname)
+    #     for fname in [
+    #         "Clip+79vu9mgSorY+P0+C0.mp4",
+    #         "Clip+-aQ4eQV8uH0+P0+C2.mp4",
+    #         "Clip+_Xf0vkqPWzg+P0+C0.mp4",
+    #         "Clip+jwuL71fWom0+P0+C0.mp4",
+    #         "Clip+Z2_OJWthxbA+P0+C0.mp4",
+    #     ]
+    # ]
     for fname in fnames:
         o = sample_frames_from_video(fname)
         # classify second extracted frame
