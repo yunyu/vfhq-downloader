@@ -86,6 +86,7 @@ def trim_and_crop(download_dir: str, output_dir: str, clip_meta: ClipMeta):
     video = stream.video
     audio = stream.audio
     video = ffmpeg.crop(video, l, t, r-l, b-t)
+    video = ffmpeg.filter(video, 'fps', fps=25, round='up')
     stream = ffmpeg.output(
         audio,
         video,
