@@ -30,6 +30,7 @@ face_landmarker = None
 def extract_and_save_lm478s(save_dir, video_path):
     global face_landmarker
     if face_landmarker is None:
+        print("Initializing face landmarker")
         face_landmarker = MediapipeLandmarker(
             read_video_to_frames=lambda video_path: get_all_frames_from_video(
                 video_path, VIDEO_WIDTH, VIDEO_HEIGHT
@@ -47,7 +48,10 @@ def extract_and_save_lm478s(save_dir, video_path):
     print("Processing: ", video_path)
 
     try:
-        img_lm478, vid_lm478 = face_landmarker.extract_lm478_from_video_name(video_path)
+        img_lm478, vid_lm478, num_failed_frames = face_landmarker.extract_lm478_from_video_name(video_path)
+        if num_failed_frames > 3:
+            raise Exception(f"Too many failed frames ({num_failed_frames}) for video: {video_basename}")
+
         lm478 = face_landmarker.combine_vid_img_lm478_to_lm478(img_lm478, vid_lm478)
         vid_dims = np.array([VIDEO_WIDTH, VIDEO_HEIGHT])
         np.savez(out_fname, lm478s=lm478, vid_dims=vid_dims)

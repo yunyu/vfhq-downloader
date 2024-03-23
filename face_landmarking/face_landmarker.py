@@ -65,8 +65,8 @@ class MediapipeLandmarker:
 
     def extract_lm478_from_video_name(self, video_name, fps=25, anti_smooth_factor=2):
         frames = self.read_video_to_frames(video_name)
-        img_lm478, vid_lm478 = self.extract_lm478_from_frames(frames, fps, anti_smooth_factor)
-        return img_lm478, vid_lm478
+        img_lm478, vid_lm478, num_failed_frames = self.extract_lm478_from_frames(frames, fps, anti_smooth_factor)
+        return img_lm478, vid_lm478, num_failed_frames
 
     def extract_lm478_from_frames(self, frames, fps=25, anti_smooth_factor=20):
         """
@@ -77,6 +77,7 @@ class MediapipeLandmarker:
         vid_mpldms = []
         img_landmarker = vision.FaceLandmarker.create_from_options(self.image_mode_options)
         vid_landmarker = vision.FaceLandmarker.create_from_options(self.video_mode_options)
+        num_failed_frames = 0
 
         for i in range(len(frames)):
             frame = mp.Image(image_format=mp.ImageFormat.SRGB, data=frames[i].astype(np.uint8))
@@ -87,6 +88,7 @@ class MediapipeLandmarker:
                 vid_ldm_i = vid_face_landmarker_result.face_landmarks[0]
             except:
                 print(f"Warning: failed detect ldm in idx={i}, use previous frame results.")
+                num_failed_frames += 1
             img_face_landmarks = np.array([[l.x, l.y, l.z] for l in img_ldm_i])
             vid_face_landmarks = np.array([[l.x, l.y, l.z] for l in vid_ldm_i])
             img_mpldms.append(img_face_landmarks)
@@ -96,7 +98,7 @@ class MediapipeLandmarker:
         bs, H, W, _ = frames.shape
         img_lm478 = np.array(img_lm478)[..., :2] * np.array([W, H]).reshape([1,1,2]) # [T, 478, 2]
         vid_lm478 = np.array(vid_lm478)[..., :2] * np.array([W, H]).reshape([1,1,2]) # [T, 478, 2]
-        return img_lm478, vid_lm478
+        return img_lm478, vid_lm478, num_failed_frames
 
     def combine_vid_img_lm478_to_lm68(self, img_lm478, vid_lm478):
         img_lm68 = img_lm478[:, index_lm68_from_lm478]
