@@ -37,9 +37,12 @@ def run_extraction_and_save_bboxes(save_dir, video_path):
 
     print("Processing: ", video_path)
 
-    bboxes, vid_dims = extract_bboxes_for_video(video_path)
-    np.savez(out_fname, bboxes=bboxes, vid_dims=vid_dims)
-    print("Saved to: ", out_fname)
+    try: 
+        bboxes, vid_dims = extract_bboxes_for_video(video_path)
+        np.savez(out_fname, bboxes=bboxes, vid_dims=vid_dims)
+        print("Saved to: ", out_fname)
+    except Exception as e:
+        print(f"Error processing video {video_basenam}: {e}")
 
 
 if __name__ == "__main__":
