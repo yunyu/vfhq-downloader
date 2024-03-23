@@ -8,8 +8,7 @@ import torch
 ctx = cpu(0)
 VIDEO_WIDTH, VIDEO_HEIGHT = 512, 512
 
-fa = face_detection.FaceAlignment(face_detection.LandmarksType._2D, flip_input=False, 
-									device='cuda')
+fa = None
                                 
 def sample_frames_from_video(video_path: str):
     vr = VideoReader(video_path, ctx=ctx, width=512, height=512)
@@ -24,8 +23,18 @@ def sample_frames_from_video(video_path: str):
 
     return out
 
+def get_all_frames_from_video(video_path: str, video_width: int, video_height: int):
+    vr = VideoReader(video_path, ctx=ctx, width=video_width, height=video_height)
+    # TODO: Check BGR (opencv) vs RGB
+    frames = vr.get_batch(list(range(len(vr)))).asnumpy()
+    return frames
 
 def extract_bboxes_for_video(video_path):
+    global fa
+    if fa is None:
+        fa = face_detection.FaceAlignment(face_detection.LandmarksType._2D, flip_input=False, 
+									device='cuda')
+
     vr = VideoReader(video_path, ctx=ctx, width=VIDEO_WIDTH, height=VIDEO_HEIGHT)
     num_frames = len(vr)
     batch_size = 32
